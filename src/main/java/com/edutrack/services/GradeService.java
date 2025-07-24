@@ -40,4 +40,8 @@ public class GradeService {
     public List<Grade> getGradesByAcademicLevel(Long levelId) {
         return gradeRepository.findByAcademicLevelId(levelId);
     }
+
+    public List<Grade> getGradesByAcademicLevelAndInstitution(Long academicLevelId, Long institutionId) {
+        return gradeRepository.findByAcademicLevelIdAndInstitutionId(academicLevelId, institutionId);
+    }
 }

@@ -2,6 +2,9 @@ package com.edutrack.services.impl;
 
 import java.util.List;
 
+import com.edutrack.entities.AcademicLevel;
+import com.edutrack.repositories.InstitutionAcademicLevelsRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.edutrack.dto.request.InstitutionDTO;
@@ -11,34 +14,34 @@ import com.edutrack.repositories.InstitutionRepository;
 import com.edutrack.services.InstitutionService;
 
 @Service
+@RequiredArgsConstructor
 public class InstitutionServiceImpl implements InstitutionService{
-     private final InstitutionRepository institutionRepository;
 
-    public InstitutionServiceImpl(InstitutionRepository institutionRepository) {
-        this.institutionRepository = institutionRepository;
-    }
+    private final InstitutionRepository institutionRepository;
+
+    private final InstitutionAcademicLevelsRepository institutionAcademicLevelsRepository;
 
     @Override
     public List<InstitutionDTO> getAllInstitutionsAsDTO() {
-    List<Institution> institutions = institutionRepository.findAll();
+        List<Institution> institutions = institutionRepository.findAll();
 
-    return institutions.stream().map(inst -> {
-        InstitutionDTO dto = new InstitutionDTO();
-        dto.setId(inst.getId());
-        dto.setName(inst.getName());
-        dto.setAddress(inst.getAddress());
-        dto.setDescription(inst.getDescription());
-        dto.setPhone(inst.getPhone());
-        dto.setWebsite(inst.getWebsite());
+        return institutions.stream().map(inst -> {
+            InstitutionDTO dto = new InstitutionDTO();
+            dto.setId(inst.getId());
+            dto.setName(inst.getName());
+            dto.setAddress(inst.getAddress());
+            dto.setDescription(inst.getDescription());
+            dto.setPhone(inst.getPhone());
+            dto.setWebsite(inst.getWebsite());
 
-        List<String> levels = inst.getAcademicLevels().stream()
-            .map(rel -> rel.getAcademicLevel().getName())
-            .toList();
+            List<String> levels = inst.getAcademicLevels().stream()
+                .map(rel -> rel.getAcademicLevel().getName())
+                .toList();
 
-        dto.setAcademicLevels(levels);
-        return dto;
-    }).toList();
-}
+            dto.setAcademicLevels(levels);
+            return dto;
+        }).toList();
+    }
 
 
     @Override
@@ -69,5 +72,8 @@ public class InstitutionServiceImpl implements InstitutionService{
         institutionRepository.delete(existing);
     }
 
-
+    @Override
+    public List<AcademicLevel> getAcademicLevelsByInstitution(Long institutionId) {
+        return institutionAcademicLevelsRepository.findAcademicLevelsByInstitutionId(institutionId);
+    }
 }

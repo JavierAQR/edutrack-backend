@@ -66,6 +66,18 @@ public class JwtUtils {
                 .compact();
     }
 
+    public static Long extractInstitutionId(String token) {
+        try {
+            Optional<Claims> claimsOptional = parseToken(token);
+            if (claimsOptional.isPresent()) {
+                return claimsOptional.get().get("institutionId", Long.class);
+            }
+        } catch (Exception e) {
+            log.error("Error al extraer institutionId del token", e);
+        }
+        return null;
+    }
+
 }
 
 

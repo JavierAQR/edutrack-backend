@@ -35,4 +35,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email AND u.id != :userId")
     boolean existsByEmailAndIdNot(@Param("email") String email, @Param("userId") Long userId);
+
+    List<User> findByInstitutionIdAndUserType(Long institutionId, UserType userType);
+
+    Optional<User> findByInstitutionIdAndIdAndUserType(Long institutionId, Long id, UserType userType);
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.studentProfile sp LEFT JOIN FETCH sp.grade g LEFT JOIN FETCH g.academicLevel WHERE u.institution.id = :institutionId AND u.userType = :userType")
+    List<User> findByInstitutionIdAndUserTypeWithProfile(@Param("institutionId") Long institutionId,
+                                                         @Param("userType") UserType userType);
 }

@@ -43,4 +43,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.studentProfile sp LEFT JOIN FETCH sp.grade g LEFT JOIN FETCH g.academicLevel WHERE u.institution.id = :institutionId AND u.userType = :userType")
     List<User> findByInstitutionIdAndUserTypeWithProfile(@Param("institutionId") Long institutionId,
                                                          @Param("userType") UserType userType);
+
+    long countByUserType(UserType userType);
 }

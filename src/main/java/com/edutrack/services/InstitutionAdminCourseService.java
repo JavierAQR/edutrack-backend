@@ -19,7 +19,6 @@ public class InstitutionAdminCourseService {
     private final CourseRepository courseRepository;
     private final GradeRepository gradeRepository;
     private final InstitutionGradeRepository institutionGradeRepository;
-    private final InstitutionRepository institutionRepository;
 
     public List<AdminCourseDTO> getCoursesByInstitution(Long institutionId) {
         return courseRepository.findByInstitutionId(institutionId)
@@ -37,8 +36,7 @@ public class InstitutionAdminCourseService {
 
     @Transactional
     public AdminCourseDTO createCourse(Long institutionId, AdminCourseRequestDTO requestDTO) {
-        Institution institution = institutionRepository.findById(institutionId)
-                .orElseThrow(() -> new RuntimeException("Institución no encontrada"));
+
 
         Grade grade = gradeRepository.findById(requestDTO.getGradeId())
                 .orElseThrow(() -> new RuntimeException("Grado no encontrado"));

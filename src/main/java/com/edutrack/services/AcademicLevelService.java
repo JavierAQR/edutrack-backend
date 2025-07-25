@@ -1,38 +1,40 @@
 package com.edutrack.services;
 
-import com.edutrack.entities.AcademicLevel;
-import com.edutrack.repositories.AcademicLevelRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.edutrack.entities.AcademicLevel;
+import com.edutrack.repositories.AcademicLevelRepository;
 
 @Service
-@RequiredArgsConstructor
 public class AcademicLevelService {
+    
+     @Autowired
+    private AcademicLevelRepository academicLevelRepository;
 
-    private final AcademicLevelRepository academicLevelRepository;
-
-    public List<AcademicLevel> getAllAcademicLevels() {
+    public List<AcademicLevel> getAll() {
         return academicLevelRepository.findAll();
     }
 
-    public AcademicLevel createAcademicLevel(AcademicLevel academicLevel) {
-        return academicLevelRepository.save(academicLevel);
+    public Optional<AcademicLevel> getById(Long id) {
+        return academicLevelRepository.findById(id);
     }
 
-    public AcademicLevel getAcademicLevelById(Long id) {
-        return academicLevelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nivel académico no encontrado"));
+    public AcademicLevel create(AcademicLevel level) {
+        return academicLevelRepository.save(level);
     }
 
-    public AcademicLevel updateAcademicLevel(Long id, AcademicLevel academicLevel) {
-        AcademicLevel existingLevel = getAcademicLevelById(id);
-        existingLevel.setName(academicLevel.getName());
-        return academicLevelRepository.save(existingLevel);
+    public AcademicLevel update(Long id, AcademicLevel level) {
+        return academicLevelRepository.findById(id).map(existing -> {
+            existing.setName(level.getName());
+            return academicLevelRepository.save(existing);
+        }).orElseThrow(() -> new RuntimeException("AcademicLevel no encontrado con ID: " + id));
     }
 
-    public void deleteAcademicLevel(Long id) {
+    public void delete(Long id) {
         academicLevelRepository.deleteById(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.edutrack.dto.response;
+package com.edutrack.dto.request;
 
 import com.edutrack.entities.TeacherProfile;
 

@@ -20,9 +20,6 @@ public class StudentProfile {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(name = "biography", columnDefinition = "TEXT")
-    private String biography;
-
     @ManyToOne
     @JoinColumn(name = "grade_id")
     private Grade grade;

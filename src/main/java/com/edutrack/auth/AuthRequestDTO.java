@@ -10,7 +10,6 @@ public record AuthRequestDTO(
     String username,
     String password,
     String email,
-    Long institutionId,
     LocalDate birthdate,
     UserType userType
 ) {

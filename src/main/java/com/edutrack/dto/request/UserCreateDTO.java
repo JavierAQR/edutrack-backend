@@ -1,6 +1,5 @@
 package com.edutrack.dto.request;
 
-import com.edutrack.entities.Institution;
 import com.edutrack.entities.enums.UserType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -37,7 +36,4 @@ public class UserCreateDTO {
 
     @NotNull(message = "El tipo de usuario es obligatorio")
     private UserType userType;
-
-    @NotNull(message = "La institución es obligatoria")
-    private Institution institution;
 }

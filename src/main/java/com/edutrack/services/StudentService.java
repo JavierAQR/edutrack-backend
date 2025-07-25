@@ -22,22 +22,10 @@ public class StudentService {
     private final StudentProfileRepository studentProfileRepository;
     private final GradeRepository gradeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final InstitutionRepository institutionRepository;
 
     public List<StudentInfoDTO> getAllStudents() {
         List<User> students = userRepository.findByUserType(UserType.STUDENT);
         return students.stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    public StudentInfoDTO getStudentById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
-
-        if (user.getUserType() != UserType.STUDENT) {
-            throw new RuntimeException("El usuario no es un estudiante");
-        }
-
-        return convertToDTO(user);
     }
 
     @Transactional
@@ -50,12 +38,6 @@ public class StudentService {
         user.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
         user.setBirthdate(studentDTO.getBirthdate());
         user.setEnabled(true);
-
-        // Buscar la institución por ID
-        Institution institution = institutionRepository.findById(studentDTO.getInstitutionId())
-                .orElseThrow(() -> new RuntimeException("Institución no encontrada"));
-        user.setInstitution(institution);
-
         user.setUserType(UserType.STUDENT);
 
         User savedUser = userRepository.save(user);
@@ -63,7 +45,7 @@ public class StudentService {
         StudentProfile profile = new StudentProfile();
         profile.setUser(savedUser);
 
-        if (studentDTO.getGradeId() != null) {
+        if(studentDTO.getGradeId() != null) {
             Grade grade = gradeRepository.findById(studentDTO.getGradeId())
                     .orElseThrow(() -> new RuntimeException("Grado no encontrado"));
             profile.setGrade(grade);
@@ -88,7 +70,7 @@ public class StudentService {
         StudentProfile profile = studentProfileRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Perfil de estudiante no encontrado"));
 
-        if (studentDTO.getGradeId() != null) {
+        if(studentDTO.getGradeId() != null) {
             Grade grade = gradeRepository.findById(studentDTO.getGradeId())
                     .orElseThrow(() -> new RuntimeException("Grado no encontrado"));
             profile.setGrade(grade);
@@ -126,10 +108,8 @@ public class StudentService {
                 .userType(user.getUserType().toString())
                 .gradeId(profile.getGrade() != null ? profile.getGrade().getId() : null)
                 .gradeName(profile.getGrade() != null ? profile.getGrade().getName() : null)
-                .academicLevel(profile.getGrade() != null && profile.getGrade().getAcademicLevel() != null
-                        ? profile.getGrade().getAcademicLevel().getName()
-                        : null)
+                .academicLevel(profile.getGrade() != null && profile.getGrade().getAcademicLevel() != null ?
+                        profile.getGrade().getAcademicLevel().getName() : null)
                 .build();
     }
-
 }

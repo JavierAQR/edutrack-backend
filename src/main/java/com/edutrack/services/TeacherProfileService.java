@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.edutrack.dto.request.TeacherProfileDTO;
-import com.edutrack.dto.response.TeacherProfileResponseDTO;
+import com.edutrack.dto.request.TeacherProfileResponseDTO;
 import com.edutrack.entities.TeacherProfile;
 import com.edutrack.entities.User;
 import com.edutrack.entities.enums.UserType;

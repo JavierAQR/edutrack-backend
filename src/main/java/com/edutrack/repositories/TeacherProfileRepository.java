@@ -20,8 +20,6 @@ public interface TeacherProfileRepository extends JpaRepository<TeacherProfile, 
     @Query("SELECT tp FROM TeacherProfile tp WHERE tp.user.institution.id = :institutionId")
     List<TeacherProfile> findByInstitutionId(Long institutionId);
 
-    List<TeacherProfile> findByUser_Institution_Id(Long institutionId);
-
     // Método para encontrar el perfil por usuario
     Optional<TeacherProfile> findByUser(User user);
 

@@ -13,11 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.edutrack.entities.Institution;
 import com.edutrack.entities.User;
 import com.edutrack.entities.enums.UserType;
 import com.edutrack.listener.RegistrationCompleteEvent;
-import com.edutrack.repositories.InstitutionRepository;
 import com.edutrack.repositories.UserRepository;
 import com.edutrack.token.VerificationToken;
 import com.edutrack.token.VerificationTokenRepository;
@@ -28,24 +26,19 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-
+    
     @Autowired
-    private AuthenticationManager authenticationManager;// Se encarga de autenticar al usuario con su nombre de usuario
-                                                        // y contraseña.
+    private AuthenticationManager authenticationManager;// Se encarga de autenticar al usuario con su nombre de usuario y contraseña.
     @Autowired
     private PasswordEncoder passwordEncoder; // Codifica las contraseñas antes de guardarlas en la base de datos.
     @Autowired
-    private UserRepository userRepository; // Repositorio que interactúa con la base de datos para las operaciones
-                                           // relacionadas con el usuario.
+    private UserRepository userRepository; // Repositorio que interactúa con la base de datos para las operaciones relacionadas con el usuario.
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private VerificationTokenRepository tokenRepository;
-
-    @Autowired
-    private InstitutionRepository institutionRepository;
 
     @Override
     public String login(String username, String password) {
@@ -70,26 +63,20 @@ public class AuthServiceImpl implements AuthService {
         var authenticate = authenticationManager.authenticate(authToken);
 
         // Genera y devuelve un token JWT utilizando el nombre de usuario autenticado.
-        return JwtUtils.generateToken(((UserDetails) (authenticate.getPrincipal())).getUsername(), user.getUserType(), user.getInstitution().getId());
+        return JwtUtils.generateToken(((UserDetails) (authenticate.getPrincipal())).getUsername(), user.getUserType());
     }
 
     @Override
-    public String signUp(String name, String lastname, String username, String password, String email,
-            LocalDate birthdate, UserType userType, Long institutionId) {
+    public String signUp(String name, String lastname, String username, String password, String email, LocalDate birthdate, UserType userType) {
 
         // Verifica si el nombre de usuario ya existe en la base de datos.
         if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("El Username ya existe"); // Lanza una excepción si el nombre de usuario ya
-                                                                 // existe.
+            throw new RuntimeException("El Username ya existe");  // Lanza una excepción si el nombre de usuario ya existe.
         }
         // Verificar si el email ya existe
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("El correo electrónico ya existe");
         }
-        // ✅ Buscar la entidad Institution
-        Institution institution = institutionRepository.findById(institutionId)
-                .orElseThrow(() -> new RuntimeException("Institución no encontrada"));
-
         // Crear un nuevo objeto Usuario
         User user = new User();
         user.setUsername(username);
@@ -97,9 +84,8 @@ public class AuthServiceImpl implements AuthService {
         user.setBirthdate(birthdate);
         user.setName(name);
         user.setLastname(lastname);
-        user.setEmail(email);
+        user.setEmail(email); 
         user.setEnabled(false);
-        user.setInstitution(institution);
         user.setUserType(userType);
 
         user = userRepository.save(user);
@@ -110,15 +96,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findByEmail (String email) {
         return userRepository.findByEmail(email);
     }
 
     @Override
-    public void saveUserVerificationToken(User theUser, String token) {
+    public void saveUserVerificationToken(User theUser, String token){
         // Crea un nuevo token de verificación para el usuario proporcionado.
-        // Se utiliza una clase llamada VerificationToken para almacenar el token y el
-        // usuario asociado.
+        // Se utiliza una clase llamada VerificationToken para almacenar el token y el usuario asociado.
         var verificationToken = new VerificationToken(token, theUser);
         // Guarda el token de verificación en el repositorio correspondiente.
         tokenRepository.save(verificationToken);
@@ -141,8 +126,7 @@ public class AuthServiceImpl implements AuthService {
         // Busca el token de verificación en el repositorio utilizando su valor.
         VerificationToken token = tokenRepository.findByToken(theToken);
         if (token == null) {
-            // Si el token no se encuentra, imprime un mensaje en la consola y retorna un
-            // mensaje de error.
+            // Si el token no se encuentra, imprime un mensaje en la consola y retorna un mensaje de error.
             System.out.println("Token no encontrado en la base de datos.");
             return "Token de verificación no válido";
         }
@@ -151,12 +135,10 @@ public class AuthServiceImpl implements AuthService {
         User user = token.getUser();
         System.out.println("Estado actual del usuario: " + user.getEnabled());
 
-        // Verifica si el token ha expirado comparando la fecha de expiración con la
-        // fecha actual.
+        // Verifica si el token ha expirado comparando la fecha de expiración con la fecha actual.
         Calendar calendar = Calendar.getInstance();
         if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0) {
-            // Si el token ha expirado, lo elimina del repositorio y retorna un mensaje de
-            // expiración.
+            // Si el token ha expirado, lo elimina del repositorio y retorna un mensaje de expiración.
             tokenRepository.delete(token);
             System.out.println("Token expirado y eliminado.");
             return "expired";
@@ -172,15 +154,14 @@ public class AuthServiceImpl implements AuthService {
             tokenRepository.delete(token);
             return "valido";
         } catch (Exception e) {
-            // Si ocurre un error al guardar el usuario, imprime el error en la consola y
-            // retorna un mensaje de error.
+            // Si ocurre un error al guardar el usuario, imprime el error en la consola y retorna un mensaje de error.
             System.out.println("Error al guardar usuario: " + e.getMessage());
             e.printStackTrace();
             return "Error al actualizar usuario";
         }
     }
 
-    // Nuevo
+    //Nuevo
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)

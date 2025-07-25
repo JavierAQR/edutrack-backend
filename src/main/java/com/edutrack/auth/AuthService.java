@@ -10,7 +10,7 @@ import com.edutrack.entities.enums.UserType;
 public interface AuthService {
 
     String login(String username, String password);
-    String signUp(String name, String lastname, String username, String password, String email, LocalDate birthdate, UserType userType, Long institutionId);
+    String signUp(String name, String lastname, String username, String password, String email, LocalDate birthdate, UserType userType);
     String verifyToken(String token);
     Optional<User> findByEmail (String email);
 

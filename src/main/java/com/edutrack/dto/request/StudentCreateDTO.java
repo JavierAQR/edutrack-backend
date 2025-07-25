@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-
 @Data
 public class StudentCreateDTO {
     @NotBlank(message = "El nombre de usuario es obligatorio")
@@ -27,9 +26,6 @@ public class StudentCreateDTO {
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     private LocalDate birthdate;
-
-    @NotNull(message = "La institución es obligatoria")
-    private Long institutionId;
 
     private Long gradeId;
 }

@@ -49,7 +49,8 @@ public class JwtUtils {
         return claimsOptional.map(Claims::getSubject);
     }
 
-    public static String generateToken (String username, UserType role, Long institutionId){
+    /* cambios */
+    public static String generateToken (String username, UserType role){
         var currentDate = new Date();
         var jwtExpirationInMinutes = 10;
         var expiration = DateUtils.addMinutes(currentDate, jwtExpirationInMinutes);
@@ -59,23 +60,10 @@ public class JwtUtils {
                 .issuer(ISSUER)
                 .subject(username)
                 .claim("role", role)
-                .claim("institutionId", institutionId)
                 .signWith(secretKey)
                 .issuedAt(currentDate)
                 .expiration(expiration)
                 .compact();
-    }
-
-    public static Long extractInstitutionId(String token) {
-        try {
-            Optional<Claims> claimsOptional = parseToken(token);
-            if (claimsOptional.isPresent()) {
-                return claimsOptional.get().get("institutionId", Long.class);
-            }
-        } catch (Exception e) {
-            log.error("Error al extraer institutionId del token", e);
-        }
-        return null;
     }
 
 }

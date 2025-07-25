@@ -1,6 +1,5 @@
 package com.edutrack.controllers;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.edutrack.dto.ApiResponse;
 import com.edutrack.dto.request.TeacherProfileDTO;
-import com.edutrack.dto.response.TeacherProfileResponse;
-import com.edutrack.dto.response.TeacherProfileResponseDTO;
+import com.edutrack.dto.request.TeacherProfileResponseDTO;
 import com.edutrack.entities.TeacherProfile;
 import com.edutrack.entities.User;
 import com.edutrack.entities.enums.UserType;
-import com.edutrack.repositories.TeacherProfileRepository;
 import com.edutrack.repositories.UserRepository;
 import com.edutrack.services.TeacherProfileService;
 
@@ -36,8 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class TeacherProfileController {
 
     private final TeacherProfileService teacherProfileService;
-    private final UserRepository userRepository;
-    private final TeacherProfileRepository teacherProfileRepository;
+    private final UserRepository userRepository; // Para obtener el usuario
 
     @PostMapping("/create")
     public ResponseEntity<?> createProfile(
@@ -45,7 +40,7 @@ public class TeacherProfileController {
             Authentication authentication) {
 
         try {
-
+            // Usar tu lógica existente para obtener el usuario
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -115,40 +110,28 @@ public class TeacherProfileController {
     public ResponseEntity<?> updateProfessionalInfo(
             @RequestBody @Valid TeacherProfileDTO profileDTO,
             Authentication authentication) {
-
+        
         try {
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
             // Verificar que es un profesor
             if (user.getUserType() != UserType.TEACHER) {
                 return ResponseEntity.badRequest()
-                        .body(new ApiResponse("Solo los profesores pueden actualizar información profesional"));
+                    .body(new ApiResponse("Solo los profesores pueden actualizar información profesional"));
             }
-
+            
             TeacherProfileResponseDTO updatedProfile = teacherProfileService.updateProfile(user.getId(), profileDTO);
-
-            return ResponseEntity
-                    .ok(new ApiResponse("Información profesional actualizada exitosamente", updatedProfile));
-
+            
+            return ResponseEntity.ok(new ApiResponse("Información profesional actualizada exitosamente", updatedProfile));
+            
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse("Error: " + e.getMessage()));
+                .body(new ApiResponse("Error: " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse("Error interno del servidor"));
+                .body(new ApiResponse("Error interno del servidor"));
         }
     }
-
-    @GetMapping("/institution/{institutionId}")
-public ResponseEntity<List<TeacherProfileResponse>> getTeachersByInstitution(@PathVariable Long institutionId) {
-    List<TeacherProfileResponse> result = teacherProfileRepository.findByUser_Institution_Id(institutionId)
-        .stream()
-        .map(t -> new TeacherProfileResponse(t.getId(), t.getUser().getName() + " " + t.getUser().getLastname()))
-        .toList();
-
-    return ResponseEntity.ok(result);
-}
-
 }

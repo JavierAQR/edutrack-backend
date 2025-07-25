@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/admin/students")
 public class StudentAdminController {
 
     private final StudentService studentService;
@@ -25,12 +25,6 @@ public class StudentAdminController {
     public ResponseEntity<ApiResponse> getAllStudents() {
         List<StudentInfoDTO> students = studentService.getAllStudents();
         return ResponseEntity.ok(new ApiResponse("Lista de estudiantes obtenida", students));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getStudentById(@PathVariable Long id) {
-        StudentInfoDTO student = studentService.getStudentById(id);
-        return ResponseEntity.ok(new ApiResponse("Estudiante obtenido exitosamente", student));
     }
 
     @PostMapping
